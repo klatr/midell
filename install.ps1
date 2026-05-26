@@ -253,3 +253,66 @@ Write-Host "  [ ] Windows 11 Taskbar Styler" -ForegroundColor Magenta
 Write-Host ""
 Write-Host "  Tip: You can search by partial name in Windhawk's 'Explore' tab." -ForegroundColor DarkGray
 Write-Host ""
+
+# ---- ZEN BROWSER: Auto-install Extensions via policies.json ----
+# policies.json is a Firefox/Zen feature that silently installs extensions
+# on first launch. We create the file in Zen's install directory.
+# The extensions listed here will appear automatically when you open Zen.
+Write-Header "Step 6: Configuring Zen Browser Extensions"
+Write-Step "Creating policies.json for Zen Browser..."
+
+# This is the folder Zen Browser installs to (confirmed from Zen's own GitHub)
+$zenPoliciesDir = "C:\Program Files\Zen Browser\distribution"
+
+# Test-Path checks if a folder exists. If not, New-Item creates it.
+if (-not (Test-Path $zenPoliciesDir)) {
+    New-Item -ItemType Directory -Path $zenPoliciesDir | Out-Null
+}
+
+# This is the policies.json content. Each URL points to a Firefox extension.
+# "force_installed" means Zen installs it automatically and it shows up ready to use.
+# "installation_mode" = "normal_installed" would install it but let you remove it.
+$policiesJson = @'
+{
+  "policies": {
+    "ExtensionSettings": {
+      "uBlock0@raymondhill.net": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi"
+      },
+      "addon@darkreader.org": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi"
+      },
+      "sponsorBlocker@ajay.app": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/sponsorblock/latest.xpi"
+      },
+      "{446900e4-71c2-419f-a6a7-df9c091e268b}": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi"
+      }
+    }
+  }
+}
+'@
+
+# Set-Content writes the JSON string to the file
+$policiesJson | Set-Content -Path "$zenPoliciesDir\policies.json" -Encoding UTF8
+Write-Success "policies.json created - extensions will install on first Zen launch"
+
+# ---- ZEN MODS CHECKLIST ----
+Write-Header "Zen Mods To Install Manually"
+Write-Host "  Open Zen Browser -> Settings -> Mods and install these:" -ForegroundColor White
+Write-Host ""
+Write-Host "  [ ] Cleaned URL bar" -ForegroundColor Cyan
+Write-Host "  [ ] Disable Rounded Corners" -ForegroundColor Cyan
+Write-Host "  [ ] Disable Status Bar" -ForegroundColor Cyan
+Write-Host "  [ ] Ghost Tabs" -ForegroundColor Cyan
+Write-Host "  [ ] No Top Sites" -ForegroundColor Cyan
+Write-Host "  [ ] Sidebar Expand on Hover" -ForegroundColor Cyan
+Write-Host "  [ ] Zen Back Forward" -ForegroundColor Cyan
+Write-Host "  [ ] Zen Context Menu" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "  Tip: Search by name in the Mods tab, or go to zen-browser.app/mods" -ForegroundColor DarkGray
+Write-Host ""
